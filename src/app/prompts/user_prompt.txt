@@ -1,0 +1,73 @@
+You will be given a series of math word problems involving various scenarios. For each problem, identify the key variables and their types, and then rewrite the problem using these variables in place of specific numbers or details. Use variables for names, numbers, and general terms that can be replaced with other words while maintaining the problem's structure. After rewriting, provide the formula or calculation method to solve the problem using these variables. Follow the given examples to format your response.
+
+Example Problem Formats and Solutions:
+
+Original problem:
+Jane wants to give everyone in her class a pencil. She has 12.5 pencils and there are 3 people in her class. How many pencils will each person get?
+
+Generalized problem:
+[name: str] wants to give everyone in [pronoun: str] [group: str] a [item: str]. [pronoun: str] has [X: float] [item_plural: str] and there are [Y: int] people in [pronoun: str] [group: str]. How many [item_plural: str] will each person get?
+name: str
+pronoun: str
+group: str
+item: str
+item_plural: str
+X: float
+Y: int
+Answer = X / Y
+
+Original problem:
+Mark is distributing his toys equally among his 5 friends. If he has 20 toys, how many toys will each friend receive?
+
+Generalized problem:
+[name: str] is [action: str] [pronoun: str] [item_plural: str] equally among [pronoun: str] [Z: int] [group_members: str]. If [pronoun: str] has [X: int] [item_plural: str], how many [item_plural: str] will each [group_member: str] receive?
+name: str
+action: str
+pronoun: str
+item_plural: str
+Z: int
+group_members: str
+group_member: str
+X: int
+Answer = X / Z
+
+Original problem:
+Sarah has 24 candies and wants to divide them equally into 6 bags. How many candies will be in each bag?
+
+Generalized problem:
+[name: str] has [X: int] [item_plural: str] and wants to [action: str] them equally into [Y: int] [container_plural: str]. How many [item_plural: str] will be in each [container: str]?
+name: str
+X: int
+item_plural: str
+action: str
+Y: int
+container_plural: str
+container: str
+Answer = X / Y
+
+Original problem:
+John had 5 marbles. His friend gave him 3 more marbles. How many marbles does John have now?
+
+Generalized problem:
+[name_a: str] had [X: int] [item_plural: str]. [pronoun: str] [relation: str] gave [pronoun: str] [Y: int] more [item_plural: str]. How many [item_plural: str] does [name_a: str] have now?
+name_a: str
+X: int
+item_plural: str
+pronoun: str
+relation: str
+Y: int
+Answer = X + Y
+
+Original problem:
+There were 10 birds on a tree. 4 birds flew away. How many birds are left on the tree?
+
+Generalized problem:
+There were [X: int] [animal_plural: str] [location: str]. [Y: int] [animal_plural: str] [action: str] away. How many [animal_plural: str] are left [location: str]?
+X: int
+animal_plural: str
+location: str
+Y: int
+action: str
+Answer = X - Y
+
+Original problem:

@@ -1,53 +1,84 @@
 // src/app/api/transform/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
+import { OpenAI } from 'openai';
+import fs from 'fs';
+import path from 'path';
+
+const openai = new OpenAI();
 
 export async function POST(request: NextRequest) {
-
     const body = await request.json();
     const { prompt } = body;
     console.log(prompt);
-    const payload = {
-        prompt: prompt,
-    };
+
+    const userPromptFile = fs.readFileSync(path.join(process.cwd(), 'src/app', 'prompts', 'user_prompt.txt'), 'utf-8');
+    const sysPromptFile = fs.readFileSync(path.join(process.cwd(), 'src/app', 'prompts', 'sys_prompt_instruct.txt'), 'utf-8');
+
+    const userPrompt = `${userPromptFile}\n${prompt}\nGeneralized Format: \n`;
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/parse_problem', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { role: 'system', content: sysPromptFile },
+                { role: 'user', content: userPrompt },
+            ],
+            model: 'gpt-4',
+            temperature: 0.1
         });
 
-        if (!response.ok) {
-            // If the response from the external API was not ok, return an error
-            return new Response(JSON.stringify({ error: `Server responded with status code ${response.status}` }), {
-                status: response.status,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+        const generatedOutput = completion.choices[0].message.content;
+        const parsedOutput = parseLLMOutput(generatedOutput || ''); // Add null check
+
+        return NextResponse.json(parsedOutput);
+    } catch (error) {
+        console.error('Failed to fetch or parse JSON:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+function parseLLMOutput(output: string) {
+    // Split the output into lines
+    const lines = output.trim().split('\n');
+
+    // The first line is the problem statement
+    const problemStatement = lines[0];
+
+    // Prepare an object to store the parsed output
+    const parsedOutput = {
+        problem: problemStatement,
+        variables: [] as Array<[string, string]>,
+        answer: '',
+    };
+
+    // Iterate over the remaining lines to parse variables
+    for (const line of lines.slice(1)) {
+        if (line.toLowerCase().includes('answer')) {
+            parsedOutput.answer = line.trim();
+            continue;
         }
 
-        const data = await response.json();
+        // Assuming the line format is 'variable_name: variable_type'
+        const parts = line.split(':');
+        if (parts.length === 2) {
+            const variableName = parts[0].trim();
+            let variableType = parts[1].trim();
 
-        // Return the data as a JSON response
-        return new Response(JSON.stringify(data), {
-            status: 200, // OK status
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+            // Validate and convert types (supports str, int, float)
+            if (variableType === 'str') {
+                variableType = 'str';
+            } else if (variableType === 'int') {
+                variableType = 'int';
+            } else if (variableType === 'float') {
+                variableType = 'float';
+            } else {
+                console.log(`Unsupported type: ${variableType}`);
+                continue;
+            }
 
-    } catch (error) {
-        console.error("Failed to fetch or parse JSON:", error);
-        // Return an internal server error response
-        return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-            status: 500,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+            // Add the variable to the list
+            parsedOutput.variables.push([variableName, variableType]);
+        }
     }
+
+    return parsedOutput;
 }
