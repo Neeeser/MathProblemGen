@@ -11,6 +11,7 @@ const SentenceParser = ({ sentence }) => {
         const elements = [];
         let lastIndex = 0;
 
+
         // Find each variable in the sentence
         sentence.match(variableRegex)?.forEach((match, index) => {
             const matchStart = sentence.indexOf(match, lastIndex);
