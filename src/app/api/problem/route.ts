@@ -1,4 +1,4 @@
-// /app/api/problems/route.ts
+// /app/api/problem/route.ts
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import dbConnect from '../../../lib/dbConnect';

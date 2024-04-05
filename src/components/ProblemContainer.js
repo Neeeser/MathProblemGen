@@ -7,17 +7,22 @@ import axios from 'axios';
 const ProblemContainer = () => {
     const [problemInput, setProblemInput] = useState('');
     const [problemData, setProblemData] = useState(null);
-
+    const [originalSentence, setOriginalSentence] = useState('');
     const handleInputChange = (event) => {
         setProblemInput(event.target.value);
     };
 
     const handleSubmit = async () => {
         try {
-            // Here you would call the API endpoint
-            const response = await axios.post('/api/transform', { prompt: problemInput });
+            // Create a new object with the problemInput value
+            const requestData = { prompt: problemInput };
+
+            // Call the API endpoint with the new object
+            const response = await axios.post('/api/transform', requestData);
+
             // Assuming the response structure is the one provided
             setProblemData(response.data);
+            setOriginalSentence(problemInput);
         } catch (error) {
             console.error('Error fetching problem data:', error);
             // Handle errors as needed
@@ -40,7 +45,7 @@ const ProblemContainer = () => {
             <Button variant="contained" color="primary" onClick={handleSubmit}>
                 Submit
             </Button>
-            {problemData && <SentenceContainer originalSentence={problemInput} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} />}
+            {problemData && <SentenceContainer originalSentence={originalSentence} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} />}
         </Box>
     );
 };

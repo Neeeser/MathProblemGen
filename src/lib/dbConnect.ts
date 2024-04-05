@@ -23,8 +23,6 @@ async function dbConnect(): Promise<mongoose.Mongoose> {
 
     if (!cached.promise) {
         const opts = {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             dbName: 'Problems',  // Specify the desired database name here
         };
 

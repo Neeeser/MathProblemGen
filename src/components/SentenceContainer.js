@@ -9,8 +9,11 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
     const [topic, setTopic] = useState('');
     const [grade, setGrade] = useState('');
     const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-
-
+    const [problemId, setProblemId] = useState(null);
+    const [savedProblems, setSavedProblems] = useState([]);
+    const [isAccepted, setIsAccepted] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [isRejected, setIsRejected] = useState(false);
 
     const handleAccept = async () => {
         setOpen(true);
@@ -20,7 +23,43 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
         setOpen(false);
     };
 
+    const handleSaveGeneratedProblem = async (problem, index) => {
+        try {
+            const response = await fetch(`/api/problem/${problemId}/generated`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    problem: problem.generated_problem,
+                    answer: problem.answer,
+                }),
+            });
+
+            if (response.ok) {
+                console.log('Generated problem saved successfully');
+                setSavedProblems([...savedProblems, index]);
+            } else {
+                console.error('Failed to save generated problem');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const handleSaveAllGeneratedProblems = async () => {
+        try {
+            for (const [index, problem] of generatedProblems.entries()) {
+                await handleSaveGeneratedProblem(problem, index);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+
     const handleGenerate = async () => {
+        setGeneratedProblems([]);
         try {
             const generatedProblems = [];
 
@@ -76,6 +115,7 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                 const data = await response.json();
                 const problemId = data.data.problemId;
                 console.log('Problem saved successfully with ID:', problemId);
+                setProblemId(problemId);
                 setTopic('');
                 setGrade('');
                 setSaveDialogOpen(false);
@@ -113,9 +153,7 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
             <SentenceParser sentence={sentence} />
             <div>{answer}</div>
 
-            <Button variant="contained" color="primary" onClick={openSaveDialog}>
-                Save Problem
-            </Button>
+
             <Box
                 sx={{
                     display: 'flex',
@@ -124,6 +162,9 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                     gap: '10px',
                 }}
             >
+                <Button variant="contained" color="primary" onClick={openSaveDialog}>
+                    Save Problem
+                </Button>
                 <Button variant="contained" color="success" onClick={handleAccept}>
                     Accept
                 </Button>
@@ -189,11 +230,24 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                 >
                     <p>{problem.generated_problem}</p>
                     <p>Answer: {problem.answer}</p>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSaveGeneratedProblem(problem, index)}
+                        disabled={savedProblems.includes(index)}
+                    >
+                        {savedProblems.includes(index) ? 'Saved' : 'Save'}
+                    </Button>
                 </Box>
             ))}
+            {generatedProblems.length > 0 && (
+                <Button variant="contained" color="primary" onClick={handleSaveAllGeneratedProblems}>
+                    Save All
+                </Button>
+            )}
         </Box>
     );
-
 };
+
 
 export default SentenceContainer;
