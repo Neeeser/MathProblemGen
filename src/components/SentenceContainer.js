@@ -6,6 +6,11 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
     const [open, setOpen] = useState(false);
     const [numProblems, setNumProblems] = useState(1);
     const [generatedProblems, setGeneratedProblems] = useState([]);
+    const [topic, setTopic] = useState('');
+    const [grade, setGrade] = useState('');
+    const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+
+
 
     const handleAccept = async () => {
         setOpen(true);
@@ -48,6 +53,49 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
         setOpen(false);
     };
 
+    const handleSaveProblem = async () => {
+        console.log(originalSentence, sentence, variables, grade, topic, answer);
+
+        try {
+            const response = await fetch('/api/problem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    originalProblem: originalSentence,
+                    generalizedProblem: sentence,
+                    variables: variables,
+                    grade: parseInt(grade.trim()),
+                    topic: topic.trim(),
+                    answer: answer,
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const problemId = data.data.problemId;
+                console.log('Problem saved successfully with ID:', problemId);
+                setTopic('');
+                setGrade('');
+                setSaveDialogOpen(false);
+            } else {
+                console.error('Failed to save problem');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const openSaveDialog = () => {
+        setSaveDialogOpen(true);
+    };
+
+    const closeSaveDialog = () => {
+        setSaveDialogOpen(false);
+    };
+
+
     return (
         <Box
             sx={{
@@ -64,6 +112,10 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
             </Box>
             <SentenceParser sentence={sentence} />
             <div>{answer}</div>
+
+            <Button variant="contained" color="primary" onClick={openSaveDialog}>
+                Save Problem
+            </Button>
             <Box
                 sx={{
                     display: 'flex',
@@ -95,6 +147,32 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
                     <Button onClick={handleGenerate}>Generate</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={saveDialogOpen} onClose={closeSaveDialog}>
+                <DialogTitle>Save Problem</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Topic"
+                        type="text"
+                        fullWidth
+                        value={topic}
+                        onChange={(e) => setTopic(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Grade"
+                        type="number"
+                        fullWidth
+                        value={grade}
+                        onChange={(e) => setGrade(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeSaveDialog}>Cancel</Button>
+                    <Button onClick={handleSaveProblem}>Save</Button>
                 </DialogActions>
             </Dialog>
             {generatedProblems.map((problem, index) => (

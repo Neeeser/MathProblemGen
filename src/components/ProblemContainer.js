@@ -40,7 +40,7 @@ const ProblemContainer = () => {
             <Button variant="contained" color="primary" onClick={handleSubmit}>
                 Submit
             </Button>
-            {problemData && <SentenceContainer orignalsentence={problemInput} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} />}
+            {problemData && <SentenceContainer originalSentence={problemInput} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} />}
         </Box>
     );
 };
