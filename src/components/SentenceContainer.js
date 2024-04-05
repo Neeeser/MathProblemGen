@@ -12,6 +12,7 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const [saveAndGenerateDialogOpen, setSaveAndGenerateDialogOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isSavingIndividual, setIsSavingIndividual] = useState({}); // Tracks saving state of individual problems
     const [isSavingAll, setIsSavingAll] = useState(false);
 
 
@@ -25,7 +26,7 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
 
     const handleSaveGeneratedProblem = async (problem, index) => {
         try {
-            setIsSaving(true);
+            setIsSavingIndividual(prev => ({...prev, [index]: true})); // Set saving state for this problem
             const response = await fetch(`/api/problem/${problemId}/generated`, {
                 method: 'POST',
                 headers: {
@@ -39,25 +40,24 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
 
             if (response.ok) {
                 console.log('Generated problem saved successfully');
-                setSavedProblems([...savedProblems, index]);
+                setSavedProblems(prev => [...prev, index]);
             } else {
                 console.error('Failed to save generated problem');
             }
         } catch (error) {
             console.error('Error:', error);
         } finally {
-            setIsSaving(false);
+            setIsSavingIndividual(prev => ({...prev, [index]: false})); // Unset saving state for this problem
         }
     };
 
     const handleSaveAllGeneratedProblems = async () => {
         try {
             setIsSavingAll(true);
-            for (const [index, problem] of generatedProblems.entries()) {
-                if (!savedProblems.includes(index)) {
-                    await handleSaveGeneratedProblem(problem, index);
-                }
-            }
+            const savingPromises = generatedProblems.map((problem, index) =>
+                !savedProblems.includes(index) ? handleSaveGeneratedProblem(problem, index) : Promise.resolve()
+            );
+            await Promise.all(savingPromises);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -213,14 +213,14 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                     <p>{problem.generated_problem}</p>
                     <p>Answer: {problem.answer}</p>
                     <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleSaveGeneratedProblem(problem, index)}
-                        disabled={savedProblems.includes(index) || isSaving}
-                    >
-                        {savedProblems.includes(index) ? 'Saved' : isSaving ? 'Saving...' : 'Save'}
-                        {isSaving && <CircularProgress size={20} sx={{ marginLeft: '10px' }} />}
-                    </Button>
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleSaveGeneratedProblem(problem, index)}
+                    disabled={savedProblems.includes(index) || isSavingIndividual[index] || isSavingAll}
+                >
+                    {savedProblems.includes(index) ? 'Saved' : isSavingIndividual[index] ? 'Saving...' : 'Save'}
+                    {isSavingIndividual[index] && <CircularProgress size={20} sx={{ marginLeft: '10px' }} />}
+                </Button>
                 </Box>
             ))}
 
