@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress } from '@mui/material';
 import SentenceParser from './SentenceParser';
 
 const SentenceContainer = ({ originalSentence, sentence, answer, variables, onReject }) => {
-    const [open, setOpen] = useState(false);
     const [numProblems, setNumProblems] = useState(1);
     const [generatedProblems, setGeneratedProblems] = useState([]);
     const [topic, setTopic] = useState('');
@@ -11,6 +10,9 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const [problemId, setProblemId] = useState(null);
     const [savedProblems, setSavedProblems] = useState([]);
     const [saveAndGenerateDialogOpen, setSaveAndGenerateDialogOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isSavingAll, setIsSavingAll] = useState(false);
 
 
     const openSaveAndGenerateDialog = () => {
@@ -21,16 +23,9 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
         setSaveAndGenerateDialogOpen(false);
     };
 
-    const handleAccept = async () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
     const handleSaveGeneratedProblem = async (problem, index) => {
         try {
+            setIsSaving(true);
             const response = await fetch(`/api/problem/${problemId}/generated`, {
                 method: 'POST',
                 headers: {
@@ -50,30 +45,29 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            setIsSaving(false);
         }
     };
 
     const handleSaveAllGeneratedProblems = async () => {
         try {
-            const updatedSavedProblems = [...savedProblems];
-
+            setIsSavingAll(true);
             for (const [index, problem] of generatedProblems.entries()) {
                 if (!savedProblems.includes(index)) {
                     await handleSaveGeneratedProblem(problem, index);
-                    updatedSavedProblems.push(index);
                 }
             }
-
-            setSavedProblems(updatedSavedProblems);
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            setIsSavingAll(false);
         }
     };
 
-
     const handleSaveAndGenerate = async () => {
         try {
-            // Save the problem
+            setIsGenerating(true);
             const response = await fetch('/api/problem', {
                 method: 'POST',
                 headers: {
@@ -97,7 +91,6 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                 setTopic('');
                 setGrade('');
 
-                // Generate similar problems
                 const generatedProblems = [];
 
                 for (let i = 0; i < numProblems; i++) {
@@ -128,6 +121,8 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -147,7 +142,6 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
             </Box>
             <SentenceParser sentence={sentence} />
             <div>{answer}</div>
-
 
             <Box
                 sx={{
@@ -194,10 +188,16 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={closeSaveAndGenerateDialog}>Cancel</Button>
-                    <Button onClick={handleSaveAndGenerate}>Save and Generate</Button>
+                    <Button onClick={closeSaveAndGenerateDialog} disabled={isGenerating}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSaveAndGenerate} disabled={isGenerating}>
+                        {isGenerating ? 'Generating...' : 'Save and Generate'}
+                        {isGenerating && <CircularProgress size={20} sx={{ marginLeft: '10px' }} />}
+                    </Button>
                 </DialogActions>
             </Dialog>
+
             {generatedProblems.map((problem, index) => (
                 <Box
                     key={index}
@@ -216,20 +216,27 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                         variant="contained"
                         color="primary"
                         onClick={() => handleSaveGeneratedProblem(problem, index)}
-                        disabled={savedProblems.includes(index)}
+                        disabled={savedProblems.includes(index) || isSaving}
                     >
-                        {savedProblems.includes(index) ? 'Saved' : 'Save'}
+                        {savedProblems.includes(index) ? 'Saved' : isSaving ? 'Saving...' : 'Save'}
+                        {isSaving && <CircularProgress size={20} sx={{ marginLeft: '10px' }} />}
                     </Button>
                 </Box>
             ))}
+
             {generatedProblems.length > 0 && (
-                <Button variant="contained" color="primary" onClick={handleSaveAllGeneratedProblems}>
-                    Save All
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSaveAllGeneratedProblems}
+                    disabled={isSavingAll}
+                >
+                    {isSavingAll ? 'Saving All...' : 'Save All'}
+                    {isSavingAll && <CircularProgress size={20} sx={{ marginLeft: '10px' }} />}
                 </Button>
             )}
         </Box>
     );
 };
-
 
 export default SentenceContainer;

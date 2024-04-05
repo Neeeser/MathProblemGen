@@ -1,6 +1,5 @@
-// In components/ProblemContainer.js
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography } from '@mui/material';
+import { Box, TextField, Button, Typography, CircularProgress } from '@mui/material';
 import SentenceContainer from './SentenceContainer';
 import axios from 'axios';
 
@@ -8,24 +7,25 @@ const ProblemContainer = () => {
     const [problemInput, setProblemInput] = useState('');
     const [problemData, setProblemData] = useState(null);
     const [originalSentence, setOriginalSentence] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleInputChange = (event) => {
         setProblemInput(event.target.value);
     };
 
     const handleSubmit = async () => {
         try {
-            // Create a new object with the problemInput value
-            const requestData = { prompt: problemInput };
+            setIsLoading(true);
 
-            // Call the API endpoint with the new object
+            const requestData = { prompt: problemInput };
             const response = await axios.post('/api/transform', requestData);
 
-            // Assuming the response structure is the one provided
             setProblemData(response.data);
             setOriginalSentence(problemInput);
         } catch (error) {
             console.error('Error fetching problem data:', error);
-            // Handle errors as needed
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -47,10 +47,26 @@ const ProblemContainer = () => {
                 onChange={handleInputChange}
                 sx={{ marginBottom: '20px' }}
             />
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-                Submit
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+                disabled={isLoading}
+            >
+                {isLoading ? 'Loading...' : 'Submit'}
             </Button>
-            {problemData && <SentenceContainer originalSentence={originalSentence} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} onReject={handleReject} />}
+            {isLoading && (
+                <CircularProgress size={24} sx={{ marginLeft: '10px' }} />
+            )}
+            {problemData && (
+                <SentenceContainer
+                    originalSentence={originalSentence}
+                    sentence={problemData.problem}
+                    answer={problemData.answer}
+                    variables={problemData.variables}
+                    onReject={handleReject}
+                />
+            )}
         </Box>
     );
 };
