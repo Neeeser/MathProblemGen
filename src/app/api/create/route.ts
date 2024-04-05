@@ -22,7 +22,7 @@ async function generateSimilarProblem(parsedResult: any) {
     const variables = parsedResult.variables;
 
     // Create a prompt for generating a similar problem
-    let prompt = "Using the following problem template and variables, generate a similar math problem using random variables. Include the final answer to the problem like \nAnswer = x:\n\n";
+    let prompt = "Using the following problem template and variables, generate a similar math problem using random variables. Include the final answer to the problem like \nAnswer = x\n\n";
     prompt += `Template: ${problemTemplate}\n`;
     prompt += "Variables:\n";
     for (const [varName, varType] of variables) {

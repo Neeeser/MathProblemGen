@@ -29,6 +29,11 @@ const ProblemContainer = () => {
         }
     };
 
+    const handleReject = () => {
+        setProblemData(null);
+        setOriginalSentence('');
+    };
+
     return (
         <Box sx={{ padding: '20px', maxWidth: '100%', margin: 'auto' }}>
             <Typography variant="h5" sx={{ marginBottom: '20px' }}>
@@ -45,7 +50,7 @@ const ProblemContainer = () => {
             <Button variant="contained" color="primary" onClick={handleSubmit}>
                 Submit
             </Button>
-            {problemData && <SentenceContainer originalSentence={originalSentence} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} />}
+            {problemData && <SentenceContainer originalSentence={originalSentence} sentence={problemData.problem} answer={problemData.answer} variables={problemData.variables} onReject={handleReject} />}
         </Box>
     );
 };

@@ -2,18 +2,24 @@ import React, { useState } from 'react';
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import SentenceParser from './SentenceParser';
 
-const SentenceContainer = ({ originalSentence, sentence, answer, variables }) => {
+const SentenceContainer = ({ originalSentence, sentence, answer, variables, onReject }) => {
     const [open, setOpen] = useState(false);
     const [numProblems, setNumProblems] = useState(1);
     const [generatedProblems, setGeneratedProblems] = useState([]);
     const [topic, setTopic] = useState('');
     const [grade, setGrade] = useState('');
-    const [saveDialogOpen, setSaveDialogOpen] = useState(false);
     const [problemId, setProblemId] = useState(null);
     const [savedProblems, setSavedProblems] = useState([]);
-    const [isAccepted, setIsAccepted] = useState(false);
-    const [isSaved, setIsSaved] = useState(false);
-    const [isRejected, setIsRejected] = useState(false);
+    const [saveAndGenerateDialogOpen, setSaveAndGenerateDialogOpen] = useState(false);
+
+
+    const openSaveAndGenerateDialog = () => {
+        setSaveAndGenerateDialogOpen(true);
+    };
+
+    const closeSaveAndGenerateDialog = () => {
+        setSaveAndGenerateDialogOpen(false);
+    };
 
     const handleAccept = async () => {
         setOpen(true);
@@ -49,53 +55,25 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
 
     const handleSaveAllGeneratedProblems = async () => {
         try {
+            const updatedSavedProblems = [...savedProblems];
+
             for (const [index, problem] of generatedProblems.entries()) {
-                await handleSaveGeneratedProblem(problem, index);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-
-    const handleGenerate = async () => {
-        setGeneratedProblems([]);
-        try {
-            const generatedProblems = [];
-
-            for (let i = 0; i < numProblems; i++) {
-                const response = await fetch('/api/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        problem: sentence,
-                        answer: answer,
-                        variables: variables,
-                    }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    generatedProblems.push(data);
-                } else {
-                    console.error('Failed to generate problem');
+                if (!savedProblems.includes(index)) {
+                    await handleSaveGeneratedProblem(problem, index);
+                    updatedSavedProblems.push(index);
                 }
             }
 
-            setGeneratedProblems(generatedProblems);
+            setSavedProblems(updatedSavedProblems);
         } catch (error) {
             console.error('Error:', error);
         }
-
-        setOpen(false);
     };
 
-    const handleSaveProblem = async () => {
-        console.log(originalSentence, sentence, variables, grade, topic, answer);
 
+    const handleSaveAndGenerate = async () => {
         try {
+            // Save the problem
             const response = await fetch('/api/problem', {
                 method: 'POST',
                 headers: {
@@ -118,7 +96,33 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                 setProblemId(problemId);
                 setTopic('');
                 setGrade('');
-                setSaveDialogOpen(false);
+
+                // Generate similar problems
+                const generatedProblems = [];
+
+                for (let i = 0; i < numProblems; i++) {
+                    const response = await fetch('/api/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            problem: sentence,
+                            answer: answer,
+                            variables: variables,
+                        }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        generatedProblems.push(data);
+                    } else {
+                        console.error('Failed to generate problem');
+                    }
+                }
+
+                setGeneratedProblems(generatedProblems);
+                setSaveAndGenerateDialogOpen(false);
             } else {
                 console.error('Failed to save problem');
             }
@@ -126,15 +130,6 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
             console.error('Error:', error);
         }
     };
-
-    const openSaveDialog = () => {
-        setSaveDialogOpen(true);
-    };
-
-    const closeSaveDialog = () => {
-        setSaveDialogOpen(false);
-    };
-
 
     return (
         <Box
@@ -162,36 +157,15 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                     gap: '10px',
                 }}
             >
-                <Button variant="contained" color="primary" onClick={openSaveDialog}>
-                    Save Problem
+                <Button variant="contained" color="primary" onClick={openSaveAndGenerateDialog}>
+                    Save and Generate
                 </Button>
-                <Button variant="contained" color="success" onClick={handleAccept}>
-                    Accept
-                </Button>
-                <Button variant="contained" color="error" onClick={() => console.log('Rejected')}>
+                <Button variant="contained" color="error" onClick={onReject}>
                     Reject
                 </Button>
             </Box>
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Generate Similar Problems</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Number of Problems"
-                        type="number"
-                        fullWidth
-                        value={numProblems}
-                        onChange={(e) => setNumProblems(parseInt(e.target.value))}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleGenerate}>Generate</Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog open={saveDialogOpen} onClose={closeSaveDialog}>
-                <DialogTitle>Save Problem</DialogTitle>
+            <Dialog open={saveAndGenerateDialogOpen} onClose={closeSaveAndGenerateDialog}>
+                <DialogTitle>Save and Generate Problems</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
@@ -210,10 +184,18 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables }) =>
                         value={grade}
                         onChange={(e) => setGrade(e.target.value)}
                     />
+                    <TextField
+                        margin="dense"
+                        label="Number of Problems"
+                        type="number"
+                        fullWidth
+                        value={numProblems}
+                        onChange={(e) => setNumProblems(parseInt(e.target.value))}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={closeSaveDialog}>Cancel</Button>
-                    <Button onClick={handleSaveProblem}>Save</Button>
+                    <Button onClick={closeSaveAndGenerateDialog}>Cancel</Button>
+                    <Button onClick={handleSaveAndGenerate}>Save and Generate</Button>
                 </DialogActions>
             </Dialog>
             {generatedProblems.map((problem, index) => (
