@@ -7,7 +7,7 @@ const Topbar = () => {
     return (
         <AppBar position="static" sx={{ backgroundColor: 'rgb(123, 40, 65)', boxShadow: 'none' }}>
             <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#ffffff' }}>
+                <Typography variant="h7" component="div" sx={{ flexGrow: 1, color: '#ffffff' }}>
                     Math Problem Generator
                 </Typography>
                 <Button color="inherit" component={Link} href="/" sx={{ color: '#ffffff' }}>
