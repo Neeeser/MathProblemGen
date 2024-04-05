@@ -123,7 +123,7 @@ const DatabaseTable = () => {
                     </MenuItem>
                     <MenuItem value="date">
                         <Checkbox checked={selectedFields.indexOf('date') > -1} />
-                        <ListItemText primary="Created At" />
+                        <ListItemText primary="Date Created" />
                     </MenuItem>
                     <MenuItem value="generatedProblems">
                         <Checkbox checked={selectedFields.indexOf('generatedProblems') > -1} />
