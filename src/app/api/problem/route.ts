@@ -61,7 +61,7 @@ export async function GET(request: Request) {
             totalPages: Math.ceil(totalProblems / limit),
             totalProblems,
         };
-
+        console.log('Problems:', problems, 'Pagination:', pagination)
         return NextResponse.json({ success: true, data: problems, pagination }, { status: 200 });
     } catch (error) {
         console.error('Error fetching problems:', error);

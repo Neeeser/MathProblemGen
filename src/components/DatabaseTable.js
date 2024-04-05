@@ -121,6 +121,14 @@ const DatabaseTable = () => {
                         <Checkbox checked={selectedFields.indexOf('answer') > -1} />
                         <ListItemText primary="Answer" />
                     </MenuItem>
+                    <MenuItem value="date">
+                        <Checkbox checked={selectedFields.indexOf('date') > -1} />
+                        <ListItemText primary="Created At" />
+                    </MenuItem>
+                    <MenuItem value="generatedProblems">
+                        <Checkbox checked={selectedFields.indexOf('generatedProblems') > -1} />
+                        <ListItemText primary="Generated Problems" />
+                    </MenuItem>
                 </Select>
             </Box>
             <TableContainer component={Paper}>
