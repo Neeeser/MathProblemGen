@@ -16,10 +16,8 @@ const ProblemContainer = () => {
     const handleSubmit = async () => {
         try {
             setIsLoading(true);
-
             const requestData = { prompt: problemInput };
             const response = await axios.post('/api/transform', requestData);
-
             setProblemData(response.data);
             setOriginalSentence(problemInput);
         } catch (error) {
@@ -36,28 +34,30 @@ const ProblemContainer = () => {
 
     return (
         <Box sx={{ padding: '20px', maxWidth: '100%', margin: 'auto' }}>
-            <Typography variant="h5" sx={{ marginBottom: '20px' }}>
+            <Typography variant="h4" sx={{ marginBottom: '20px' }}>
                 Enter Math Problem:
             </Typography>
-            <TextField
-                fullWidth
-                variant="outlined"
-                label="Math Problem"
-                value={problemInput}
-                onChange={handleInputChange}
-                sx={{ marginBottom: '20px' }}
-            />
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-                disabled={isLoading}
-            >
-                {isLoading ? 'Loading...' : 'Submit'}
-            </Button>
-            {isLoading && (
-                <CircularProgress size={24} sx={{ marginLeft: '10px' }} />
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Math Problem"
+                    value={problemInput}
+                    onChange={handleInputChange}
+                    sx={{ marginRight: '10px' }}
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Loading...' : 'Submit'}
+                </Button>
+                {isLoading && (
+                    <CircularProgress size={24} sx={{ marginLeft: '10px' }} />
+                )}
+            </Box>
             {problemData && (
                 <SentenceContainer
                     originalSentence={originalSentence}
