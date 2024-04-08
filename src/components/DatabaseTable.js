@@ -13,20 +13,22 @@ import {
     ListItemText,
     Typography,
     Box,
-    IconButton,
-    TextField
+    TextField,
+    Link
 } from '@mui/material';
 import { Pagination } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import { useRouter } from 'next/navigation';
 
 const DatabaseTable = () => {
     const [problems, setProblems] = useState([]);
-    const [selectedFields, setSelectedFields] = useState(['originalProblem', 'generalizedProblem', 'answer']);
+    const [selectedFields, setSelectedFields] = useState(['originalProblem', 'generalizedProblem', 'answer', 'generatedProblems']);
     const [filterOpen, setFilterOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
+    const router = useRouter();
 
     const fetchProblems = async () => {
         try {
@@ -65,6 +67,10 @@ const DatabaseTable = () => {
         setFilterOpen(!filterOpen);
     };
 
+    const handleGeneratedProblemsClick = (problemId) => {
+        router.push(`/problems/${problemId}/generated`);
+    };
+
     return (
         <Box sx={{ padding: '20px', maxWidth: '100%', margin: 'auto' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
@@ -96,7 +102,6 @@ const DatabaseTable = () => {
                     IconComponent={FilterListIcon}
                     sx={{ '& .MuiSelect-icon': { transform: 'none' } }}
                 >
-
                     <MenuItem value="problemId">
                         <Checkbox checked={selectedFields.indexOf('problemId') > -1} />
                         <ListItemText primary="Problem ID" />
@@ -138,13 +143,26 @@ const DatabaseTable = () => {
                             {selectedFields.map((field) => (
                                 <TableCell key={field}>{field}</TableCell>
                             ))}
+                            
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {problems.map((problem) => (
                             <TableRow key={problem.problemId}>
                                 {selectedFields.map((field) => (
-                                    <TableCell key={field}>{problem[field]}</TableCell>
+                                    <TableCell key={field}>
+                                        {field === 'generatedProblems' ? (
+                                            <Link
+                                                component="button"
+                                                variant="body2"
+                                                onClick={() => handleGeneratedProblemsClick(problem.problemId)}
+                                            >
+                                                View Generated Problems
+                                            </Link>
+                                        ) : (
+                                            problem[field]
+                                        )}
+                                    </TableCell>
                                 ))}
                             </TableRow>
                         ))}
@@ -157,7 +175,6 @@ const DatabaseTable = () => {
                 onChange={handlePageChange}
                 sx={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}
             />
-
         </Box>
     );
 };

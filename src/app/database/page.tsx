@@ -1,9 +1,9 @@
 "use client";
 import React from 'react';
-import DatabaseTable from '../../components/DatabaseTable';
+import DatabaseTable from '@/components/DatabaseTable';
 
-const ExampleUsage = () => {
+const DatabasePage = () => {
     return <DatabaseTable />;
 };
 
-export default ExampleUsage;
+export default DatabasePage;

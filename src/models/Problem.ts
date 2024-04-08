@@ -1,11 +1,17 @@
 // /models/Problem.ts
+
 import mongoose, { Document } from 'mongoose';
+
+export interface GeneratedProblem {
+    problem: string;
+    answer: string;
+}
 
 export interface ProblemDocument extends Document {
     problemId: string;
     originalProblem: string;
     generalizedProblem: string;
-    generatedProblems: string[];
+    generatedProblems: GeneratedProblem[];
     variables: [string, string][];
     grade: number;
     topic: string;
@@ -21,7 +27,12 @@ const ProblemSchema = new mongoose.Schema({
     },
     originalProblem: String,
     generalizedProblem: String,
-    generatedProblems: [String],
+    generatedProblems: [
+        {
+            problem: String,
+            answer: String,
+        },
+    ],
     variables: [[String, String]],
     grade: Number,
     topic: String,

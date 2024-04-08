@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import ProblemContainer from '../components/ProblemContainer';
+import ProblemContainer from '@/components/ProblemContainer';
 
 const ExampleUsage = () => {
   return <ProblemContainer />;
