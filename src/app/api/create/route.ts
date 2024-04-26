@@ -33,7 +33,7 @@ async function generateSimilarProblem(parsedResult: any) {
     try {
         // Make the API request to generate a similar problem
         const response = await openai.chat.completions.create({
-            model: 'gpt-4',
+            model: 'gpt-4-turbo',
             messages: [
                 { role: 'system', content: 'You are a math problem generator.' },
                 { role: 'user', content: prompt },
