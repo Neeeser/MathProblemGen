@@ -1,9 +1,9 @@
 "use client";
 import React from 'react';
-import GradeView from '@/components/GradeView';
+import ProblemContainer from '@/components/ProblemContainer';
 
 const ExampleUsage = () => {
-  return <GradeView />;
+  return <ProblemContainer />;
 };
 
 export default ExampleUsage;

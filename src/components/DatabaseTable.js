@@ -32,7 +32,7 @@ const DatabaseTable = () => {
 
     const fetchProblems = async () => {
         try {
-            const response = await fetch(`/api/problem?page=${currentPage}&limit=${pageSize}&search=${searchTerm}`);
+            const response = await fetch(`/api/grades?page=${currentPage}&limit=${pageSize}&search=${searchTerm}`);
             const data = await response.json();
             setProblems(data.data);
             setTotalPages(data.pagination.totalPages);

@@ -25,7 +25,7 @@ const GeneratedProblemsTable = () => {
 
     const fetchGeneratedProblems = async () => {
         try {
-            const response = await fetch(`/api/problem/${problemId}/generated?page=${currentPage}&limit=${pageSize}&search=${searchTerm}`);
+            const response = await fetch(`/api/grades/${problemId}/generated?page=${currentPage}&limit=${pageSize}&search=${searchTerm}`);
             const data = await response.json();
             setGeneratedProblems(data.data);
             setTotalPages(data.pagination.totalPages);

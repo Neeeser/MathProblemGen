@@ -13,9 +13,8 @@ export interface ProblemDocument extends Document {
     generalizedProblem: string;
     generatedProblems: GeneratedProblem[];
     variables: [string, string][];
-    grade: number;
-    topic: string;
     answer: string;
+    //problemLoc: [string, string, String, String],
     date: Date;
 }
 
@@ -34,9 +33,8 @@ const ProblemSchema = new mongoose.Schema({
         },
     ],
     variables: [[String, String]],
-    grade: Number,
-    topic: String,
     answer: String,
+    //problemLoc: [String, String, String, String],
     date: {
         type: Date,
         default: Date.now,

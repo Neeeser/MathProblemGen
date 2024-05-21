@@ -11,6 +11,9 @@ const Topbar = () => {
                     Math Problem Generator
                 </Typography>
                 <Button color="inherit" component={Link} href="/" sx={{ color: '#ffffff' }}>
+                    Grade View
+                </Button>
+                <Button color="inherit" component={Link} href="/generator" sx={{ color: '#ffffff' }}>
                     Generate
                 </Button>
                 <Button color="inherit" component={Link} href="/database" sx={{ color: '#ffffff' }}>

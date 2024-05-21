@@ -6,6 +6,8 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const [numProblems, setNumProblems] = useState(1);
     const [generatedProblems, setGeneratedProblems] = useState([]);
     const [topic, setTopic] = useState('');
+    const [subtopic, setSubtopic] = useState('');
+    const [questionType, setQuestionType] = useState('');
     const [grade, setGrade] = useState('');
     const [problemId, setProblemId] = useState(null);
     const [savedProblems, setSavedProblems] = useState([]);
@@ -14,7 +16,6 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSavingIndividual, setIsSavingIndividual] = useState({}); // Tracks saving state of individual problems
     const [isSavingAll, setIsSavingAll] = useState(false);
-
 
     const openSaveAndGenerateDialog = () => {
         setSaveAndGenerateDialogOpen(true);
@@ -26,8 +27,9 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
 
     const handleSaveGeneratedProblem = async (problem, index) => {
         try {
+            console.log("STARTED TO SAVE");
             setIsSavingIndividual(prev => ({...prev, [index]: true})); // Set saving state for this problem
-            const response = await fetch(`/api/problem/${problemId}/generated`, {
+            const response = await fetch(`/api/grades/${problemId}/generated`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,17 +70,19 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const handleSaveAndGenerate = async () => {
         try {
             setIsGenerating(true);
-            const response = await fetch('/api/problem', {
+            const response = await fetch('/api/grades', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    grade: parseInt(grade.trim()),
+                    topic: topic.trim(),
+                    subtopic: subtopic.trim(),
+                    questionType: questionType.trim(),
                     originalProblem: originalSentence,
                     generalizedProblem: sentence,
                     variables: variables,
-                    grade: parseInt(grade.trim()),
-                    topic: topic.trim(),
                     answer: answer,
                 }),
             });
@@ -90,6 +94,8 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                 setProblemId(problemId);
                 setTopic('');
                 setGrade('');
+                setSubtopic('');
+                setQuestionType('');
 
                 const generatedProblems = [];
 
@@ -164,6 +170,14 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                     <TextField
                         autoFocus
                         margin="dense"
+                        label="Grade"
+                        type="number"
+                        fullWidth
+                        value={grade}
+                        onChange={(e) => setGrade(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
                         label="Topic"
                         type="text"
                         fullWidth
@@ -172,11 +186,19 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
                     />
                     <TextField
                         margin="dense"
-                        label="Grade"
-                        type="number"
+                        label="Subtopic"
+                        type="text"
                         fullWidth
-                        value={grade}
-                        onChange={(e) => setGrade(e.target.value)}
+                        value={subtopic}
+                        onChange={(e) => setSubtopic(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Question Type"
+                        type="text"
+                        fullWidth
+                        value={questionType}
+                        onChange={(e) => setQuestionType(e.target.value)}
                     />
                     <TextField
                         margin="dense"

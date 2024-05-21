@@ -1,0 +1,119 @@
+/* /components/GradeView.module.css */
+
+.container {
+    font-family: var(--font-mono);
+    padding: 2rem;
+    max-width: var(--max-width);
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .item {
+    margin-bottom: 2rem;
+    border: 1px solid rgba(var(--card-border-rgb), 0.15);
+    border-radius: var(--border-radius);
+    background: rgba(var(--card-rgb), 0.1);
+    padding: 1.5rem;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    background: rgba(var(--card-rgb), 0.2);
+    border-radius: var(--border-radius);
+    transition: background 200ms;
+  }
+  
+  .header:hover {
+    background: rgba(var(--card-rgb), 0.3);
+  }
+  
+  .label {
+    font-weight: bold;
+    color: rgba(var(--card-border-rgb), 0.7);
+    margin-right: 0.5rem;
+  }
+  
+  .subList,
+  .subSubList,
+  .subSubSubList,
+  .questionList {
+    background: rgba(var(--card-rgb), 0.05);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .subItem,
+  .subSubItem,
+  .subSubSubItem,
+  .questionItem {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(var(--card-border-rgb), 0.1);
+  }
+  
+  .subItem:last-child,
+  .subSubItem:last-child,
+  .subSubSubItem:last-child,
+  .questionItem:last-child {
+    border-bottom: none;
+  }
+  
+  .subHeader {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    background: rgba(var(--card-rgb), 0.15);
+    border-radius: var(--border-radius);
+    transition: background 200ms;
+  }
+  
+  .subHeader:hover {
+    background: rgba(var(--card-rgb), 0.25);
+  }
+  
+  .subSubHeader {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    padding: 0.4rem;
+    background: rgba(var(--card-rgb), 0.1);
+    border-radius: var(--border-radius);
+    transition: background 200ms;
+  }
+  
+  .subSubHeader:hover {
+    background: rgba(var(--card-rgb), 0.2);
+  }
+  
+  .subSubSubHeader {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    background: rgba(var(--card-rgb), 0.05);
+    border-radius: var(--border-radius);
+    transition: background 200ms;
+  }
+  
+  .subSubSubHeader:hover {
+    background: rgba(var(--card-rgb), 0.15);
+  }
