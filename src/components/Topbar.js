@@ -10,13 +10,10 @@ const Topbar = () => {
                 <Typography variant="h7" component="div" sx={{ flexGrow: 1, color: '#ffffff' }}>
                     Math Problem Generator
                 </Typography>
-                <Button color="inherit" component={Link} href="/" sx={{ color: '#ffffff' }}>
-                    Grade View
-                </Button>
                 <Button color="inherit" component={Link} href="/generator" sx={{ color: '#ffffff' }}>
                     Generate
                 </Button>
-                <Button color="inherit" component={Link} href="/database" sx={{ color: '#ffffff' }}>
+                <Button color="inherit" component={Link} href="/" sx={{ color: '#ffffff' }}>
                     Database
                 </Button>
             </Toolbar>

@@ -14,23 +14,23 @@ const QuestionTypeSchema = new mongoose.Schema({
 });
 
 export interface SubtopicDocument extends Document {
-    subtopic: string;
+    subTopic: string;
     questionTypes: QuestionTypeDocument[];
 }
 
 const SubtopicSchema = new mongoose.Schema({
-    subtopic: { type: String, required: true },
+    subTopic: { type: String, required: true },
     questionTypes: [QuestionTypeSchema],
 });
 
 export interface TopicDocument extends Document {
     topic: string;
-    subtopics: SubtopicDocument[];
+    subTopics: SubtopicDocument[];
 }
 
 const TopicSchema = new mongoose.Schema({
     topic: { type: String, required: true },
-    subtopics: [SubtopicSchema],
+    subTopics: [SubtopicSchema],
 });
 
 export interface GradeDocument extends Document {

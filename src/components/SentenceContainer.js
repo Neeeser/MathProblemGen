@@ -16,6 +16,7 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSavingIndividual, setIsSavingIndividual] = useState({}); // Tracks saving state of individual problems
     const [isSavingAll, setIsSavingAll] = useState(false);
+    const [lastProblemLocation, setLastProblemLocation] = useState({});
 
     const openSaveAndGenerateDialog = () => {
         setSaveAndGenerateDialogOpen(true);
@@ -29,14 +30,13 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
         try {
             console.log("STARTED TO SAVE");
             setIsSavingIndividual(prev => ({...prev, [index]: true})); // Set saving state for this problem
-            const response = await fetch(`/api/grades/${problemId}/generated`, {
+            const response = await fetch(`/api/grades/${lastProblemLocation["grade"]}/topics/${lastProblemLocation["topic"]}/subTopics/${lastProblemLocation["subTopic"]}/questionTypes/${lastProblemLocation["questionType"]}/problems/${problemId}/generated`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    problem: problem.generated_problem,
-                    answer: problem.answer,
+                    generatedProblems: generatedProblems,
                 }),
             });
 
@@ -70,16 +70,12 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
     const handleSaveAndGenerate = async () => {
         try {
             setIsGenerating(true);
-            const response = await fetch('/api/grades', {
+            const response = await fetch(`/api/grades/${grade.trim()}/topics/${topic.trim()}/subTopics/${subtopic.trim()}/questionTypes/${questionType.trim()}/problems`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    grade: parseInt(grade.trim()),
-                    topic: topic.trim(),
-                    subtopic: subtopic.trim(),
-                    questionType: questionType.trim(),
                     originalProblem: originalSentence,
                     generalizedProblem: sentence,
                     variables: variables,
@@ -90,7 +86,9 @@ const SentenceContainer = ({ originalSentence, sentence, answer, variables, onRe
             if (response.ok) {
                 const data = await response.json();
                 const problemId = data.data.problemId;
+                const problemLoc = data.data.problemLoc;
                 console.log('Problem saved successfully with ID:', problemId);
+                setLastProblemLocation(problemLoc);
                 setProblemId(problemId);
                 setTopic('');
                 setGrade('');

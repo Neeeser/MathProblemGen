@@ -14,7 +14,12 @@ export interface ProblemDocument extends Document {
     generatedProblems: GeneratedProblem[];
     variables: [string, string][];
     answer: string;
-    //problemLoc: [string, string, String, String],
+    problemLoc: {
+        "grade": string,
+        "topic": string,
+        "subTopic": string,
+        "questionType": string,
+    },
     date: Date;
 }
 
@@ -34,11 +39,16 @@ const ProblemSchema = new mongoose.Schema({
     ],
     variables: [[String, String]],
     answer: String,
-    //problemLoc: [String, String, String, String],
+    problemLoc: {
+        "grade": Number,
+        "topic": String,
+        "subTopic": String,
+        "questionType": String,
+    },
     date: {
         type: Date,
         default: Date.now,
     },
 });
 
-export default mongoose.models.Problem || mongoose.model<ProblemDocument>('Problem', ProblemSchema, 'problems');
+export default mongoose.models.Problem || mongoose.model<ProblemDocument>('Problem', ProblemSchema);
